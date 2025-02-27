@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entrenamiento Personalizado</title>
+  <!-- Cargar Tailwind CSS y Chart.js desde CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-pink-50 font-sans">
+  <div class="max-w-4xl mx-auto p-4">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-pink-400 to-purple-400 text-white p-6 rounded-lg shadow-lg mb-6">
+      <h1 class="text-4xl font-bold text-center">Entrenamiento Personalizado</h1>
+      <p class="text-center mt-2">La mejor app para alcanzar tus metas de fitness.</p>
+    </header>
+    <!-- Instrucciones -->
+    <section class="text-center mb-6">
+      <p class="text-gray-700">Guarda este archivo como <strong>entrenamiento.html</strong> y ábrelo en tu navegador para comenzar.</p>
+    </section>
+    <!-- Navegación de Meses -->
+    <div class="mb-4 flex flex-wrap justify-center gap-2">
+      <button class="month-btn bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-full shadow" data-month="Mes 1">Mes 1</button>
+      <button class="month-btn bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-full shadow" data-month="Mes 2">Mes 2</button>
+      <button class="month-btn bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-full shadow" data-month="Mes 3">Mes 3</button>
+      <button class="month-btn bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-full shadow" data-month="Mes 4">Mes 4</button>
+      <button class="month-btn bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-full shadow" data-month="Mes 5">Mes 5</button>
+      <button class="month-btn bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-full shadow" data-month="Mes 6">Mes 6</button>
+    </div>
+    <!-- Navegación de Días -->
+    <div class="mb-4 flex flex-wrap justify-center gap-2">
+      <button class="day-btn bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-full shadow" data-day="Día 1">Día 1</button>
+      <button class="day-btn bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-full shadow" data-day="Día 2">Día 2</button>
+      <button class="day-btn bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-full shadow" data-day="Día 3">Día 3</button>
+    </div>
+    <!-- Contenido de la Rutina -->
+    <div id="routineContent" class="mb-6"></div>
+    <!-- Rutinas de Movilidad -->
+    <div class="mb-6 p-6 bg-white rounded-lg shadow-lg">
+      <h2 class="text-2xl font-bold mb-4 text-center text-pink-500">Rutinas de Movilidad</h2>
+      <ul class="list-disc pl-5 text-gray-700 text-lg">
+        <li>Movilidad articular: Rotación de cuello, hombros, caderas, rodillas y tobillos – 2-3 series de 10 repeticiones.</li>
+        <li>Estiramiento: Isquiotibiales, cuádriceps y pectorales – 2 series de 30 segundos cada uno.</li>
+      </ul>
+    </div>
+    <!-- Botón para Guardar Progreso -->
+    <div class="mb-6 text-center">
+      <button id="saveProgressBtn" class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg">
+        Guardar Progreso
+      </button>
+    </div>
+    <!-- Gráfico de Progreso -->
+    <div class="bg-white p-6 rounded-lg shadow-lg mb-6">
+      <h2 class="text-2xl font-bold mb-4 text-center text-purple-500">Progreso</h2>
+      <canvas id="progressChart"></canvas>
+    </div>
+  </div>
+  
+  <script>
+    // Datos de la rutina
+    const routineData = {
+      "Mes 1": {
+        objetivo: "Adaptación y Base Técnica. Familiarizarse con los ejercicios, mejorar la técnica y establecer una base sólida. Cargas ligeras a moderadas, con énfasis en el control del movimiento.",
+        dias: {
+          "Día 1": [
+            { nombre: "Prensa de piernas (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "60s" },
+            { nombre: "Jalón al pecho (máquina, agarre ancho)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "60s" },
+            { nombre: "Press de pecho (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "60s" },
+            { nombre: "Extensiones de piernas (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Curl de piernas (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Plancha abdominal (peso corporal)", sets: 3, reps: "30-40 seg", tempo: "N/A", descanso: "30s" }
+          ],
+          "Día 2": [
+            { nombre: "Sentadilla en máquina Smith", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "60s" },
+            { nombre: "Remo sentado (máquina, agarre neutro)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "60s" },
+            { nombre: "Press de hombros (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "60s" },
+            { nombre: "Puente de glúteos (peso corporal o con mancuerna)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Elevaciones laterales (mancuernas)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Crunch abdominal en máquina", sets: 3, reps: "15-20", tempo: "N/A", descanso: "30s" }
+          ],
+          "Día 3": [
+            { nombre: "Peso muerto rumano (mancuernas)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "60s" },
+            { nombre: "Jalón al pecho (máquina, agarre cerrado)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "60s" },
+            { nombre: "Press inclinado (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "60s" },
+            { nombre: "Zancadas estáticas (peso corporal o con mancuernas)", sets: 3, reps: "10-12 por pierna", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Curl de bíceps (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Plancha lateral (peso corporal)", sets: 3, reps: "20-30 seg por lado", tempo: "N/A", descanso: "30s" }
+          ]
+        }
+      },
+      "Mes 2": {
+        objetivo: "Progresión de Intensidad. Aumentar la intensidad con cargas moderadas y reducir ligeramente las repeticiones en ejercicios principales. Introducir variaciones para mantener el estímulo.",
+        dias: {
+          "Día 1": [
+            { nombre: "Prensa de piernas (máquina)", sets: 4, reps: "10-12", tempo: "2-0-1-0", descanso: "60s" },
+            { nombre: "Jalón al pecho (máquina, agarre ancho)", sets: 4, reps: "10-12", tempo: "2-0-1-0", descanso: "60s" },
+            { nombre: "Press de pecho (máquina)", sets: 4, reps: "10-12", tempo: "2-0-1-0", descanso: "60s" },
+            { nombre: "Extensiones de piernas (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Curl de piernas (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Plancha abdominal con elevación de pierna", sets: 3, reps: "20-30 seg por pierna", tempo: "N/A", descanso: "30s" }
+          ],
+          "Día 2": [
+            { nombre: "Sentadilla en máquina Smith (pausa 1s)", sets: 4, reps: "10-12", tempo: "2-1-1-0", descanso: "60s" },
+            { nombre: "Remo sentado (máquina, agarre neutro)", sets: 4, reps: "10-12", tempo: "2-0-1-0", descanso: "60s" },
+            { nombre: "Press de hombros (máquina)", sets: 4, reps: "10-12", tempo: "2-0-1-0", descanso: "60s" },
+            { nombre: "Puente de glúteos con mancuerna", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Elevaciones laterales (mancuernas)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Crunch abdominal en máquina", sets: 3, reps: "15-20", tempo: "N/A", descanso: "30s" }
+          ],
+          "Día 3": [
+            { nombre: "Peso muerto rumano (mancuernas)", sets: 4, reps: "10-12", tempo: "2-0-1-0", descanso: "60s" },
+            { nombre: "Jalón al pecho (máquina, agarre cerrado)", sets: 4, reps: "10-12", tempo: "2-0-1-0", descanso: "60s" },
+            { nombre: "Press inclinado (máquina)", sets: 4, reps: "10-12", tempo: "2-0-1-0", descanso: "60s" },
+            { nombre: "Zancadas estáticas (peso corporal o con mancuernas)", sets: 3, reps: "10-12 por pierna", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Curl de bíceps (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Plancha lateral con rotación", sets: 3, reps: "20-30 seg por lado", tempo: "N/A", descanso: "30s" }
+          ]
+        }
+      },
+      "Mes 3": {
+        objetivo: "Variación y Estímulo Metabólico. Técnicas avanzadas, mayor volumen en accesorios y superseries para incrementar el gasto calórico.",
+        dias: {
+          "Día 1": [
+            { nombre: "Prensa de piernas (máquina)", sets: 4, reps: "10-12", tempo: "3-0-1-0", descanso: "60s" },
+            { nombre: "Superserie: Jalón al pecho / Press de pecho (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "60s entre rondas" },
+            { nombre: "Extensiones de piernas (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Curl de piernas (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Plancha abdominal con elevación de brazo", sets: 3, reps: "20-30 seg por brazo", tempo: "N/A", descanso: "30s" }
+          ],
+          "Día 2": [
+            { nombre: "Prensa de piernas (máquina)", sets: 4, reps: "10-12", tempo: "3-0-1-0", descanso: "60s" },
+            { nombre: "Superserie: Jalón al pecho / Press de pecho (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "60s entre rondas" },
+            { nombre: "Extensiones de piernas (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Curl de piernas (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Plancha abdominal con elevación de brazo", sets: 3, reps: "20-30 seg por brazo", tempo: "N/A", descanso: "30s" }
+          ],
+          "Día 3": [
+            { nombre: "Prensa de piernas (máquina)", sets: 4, reps: "10-12", tempo: "3-0-1-0", descanso: "60s" },
+            { nombre: "Superserie: Jalón al pecho / Press de pecho (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "60s entre rondas" },
+            { nombre: "Extensiones de piernas (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Curl de piernas (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Plancha abdominal con elevación de brazo", sets: 3, reps: "20-30 seg por brazo", tempo: "N/A", descanso: "30s" }
+          ]
+        }
+      },
+      "Mes 4": {
+        objetivo: "Refinamiento y Tonificación. Superseries y pausas controladas para tonificar y aumentar el gasto calórico.",
+        dias: {
+          "Día 1": [
+            { nombre: "Superserie: Prensa de piernas / Jalón al pecho (máquina)", sets: 4, reps: "10-12", tempo: "2-0-1-0", descanso: "60s entre rondas" },
+            { nombre: "Press de pecho (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Extensiones de piernas (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Plancha abdominal con elevación de pierna", sets: 3, reps: "20-30 seg por pierna", tempo: "N/A", descanso: "30s" }
+          ],
+          "Día 2": [
+            { nombre: "Superserie: Sentadilla en máquina Smith (pausa 1s) / Remo sentado (agarre neutro)", sets: 4, reps: "10-12", tempo: "2-1-1-0 y 2-0-1-0", descanso: "60s entre rondas" },
+            { nombre: "Press de hombros (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Puente de glúteos con mancuerna", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Crunch abdominal en máquina", sets: 3, reps: "15-20", tempo: "N/A", descanso: "30s" }
+          ],
+          "Día 3": [
+            { nombre: "Circuito (3 rondas):", sets: 3, reps: "Circuito", tempo: "N/A", descanso: "90s entre rondas", detalles: [
+                "Peso muerto rumano (mancuernas) – 10-12 rep",
+                "Jalón al pecho (máquina, agarre cerrado) – 10-12 rep",
+                "Press inclinado (máquina) – 10-12 rep",
+                "Zancadas estáticas – 10-12 por pierna",
+                "Plancha lateral con rotación – 20-30 seg por lado"
+              ] }
+          ]
+        }
+      },
+      "Mes 5": {
+        objetivo: "Tonificación Avanzada. Técnicas avanzadas (drop sets, superseries) para maximizar la tonificación y el gasto calórico.",
+        dias: {
+          "Día 1": [
+            { nombre: "Prensa de piernas (con drop set en última serie)", sets: 4, reps: "10-12 (+ drop set 8-10)", tempo: "2-0-1-0", descanso: "60s" },
+            { nombre: "Superserie: Jalón al pecho / Press de pecho (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "60s entre rondas" },
+            { nombre: "Extensiones de piernas (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Plancha abdominal con elevación de pierna", sets: 3, reps: "20-30 seg por pierna", tempo: "N/A", descanso: "30s" }
+          ],
+          "Día 2": [
+            { nombre: "Sentadilla en máquina Smith (pausa 2s)", sets: 4, reps: "10-12", tempo: "2-2-1-0", descanso: "60s" },
+            { nombre: "Superserie: Remo sentado / Press de hombros (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "60s entre rondas" },
+            { nombre: "Puente de glúteos con mancuerna", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Crunch abdominal en máquina", sets: 3, reps: "15-20", tempo: "N/A", descanso: "30s" }
+          ],
+          "Día 3": [
+            { nombre: "Circuito (3 rondas):", sets: 3, reps: "Circuito", tempo: "N/A", descanso: "90s entre rondas", detalles: [
+                "Peso muerto rumano (mancuernas) – 10-12 rep",
+                "Jalón al pecho (máquina, agarre cerrado) – 10-12 rep",
+                "Press inclinado (máquina) – 10-12 rep",
+                "Zancadas estáticas – 10-12 por pierna",
+                "Plancha lateral con rotación – 20-30 seg por lado"
+              ] }
+          ]
+        }
+      },
+      "Mes 6": {
+        objetivo: "Máxima Tonificación y Definición. Circuitos y superseries de alta intensidad para maximizar el gasto calórico y la definición muscular.",
+        dias: {
+          "Día 1": [
+            { nombre: "Superserie: Prensa de piernas / Jalón al pecho (máquina)", sets: 4, reps: "10-12", tempo: "2-0-1-0", descanso: "60s entre rondas" },
+            { nombre: "Press de pecho (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Extensiones de piernas (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Plancha abdominal con elevación de pierna", sets: 3, reps: "20-30 seg por pierna", tempo: "N/A", descanso: "30s" }
+          ],
+          "Día 2": [
+            { nombre: "Superserie: Sentadilla en máquina Smith (pausa 2s) / Remo sentado (agarre neutro)", sets: 4, reps: "10-12", tempo: "Sentadilla: 2-2-1-0, Remo: 2-0-1-0", descanso: "60s entre rondas" },
+            { nombre: "Press de hombros (máquina)", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Puente de glúteos con mancuerna", sets: 3, reps: "12-15", tempo: "2-0-1-0", descanso: "45s" },
+            { nombre: "Crunch abdominal en máquina", sets: 3, reps: "15-20", tempo: "N/A", descanso: "30s" }
+          ],
+          "Día 3": [
+            { nombre: "Circuito (4 rondas):", sets: 4, reps: "Circuito", tempo: "N/A", descanso: "90s entre rondas", detalles: [
+                "Peso muerto rumano (mancuernas) – 10-12 rep",
+                "Jalón al pecho (máquina, agarre cerrado) – 10-12 rep",
+                "Press inclinado (máquina) – 10-12 rep",
+                "Zancadas estáticas – 10-12 por pierna",
+                "Plancha lateral con rotación – 20-30 seg por lado"
+              ] }
+          ]
+        }
+      }
+    };
+
+    // Variables de estado
+    let currentMonth = "Mes 1";
+    let currentDay = "Día 1";
+    let progressData = {};
+
+    // Cargar progreso de localStorage (si existe)
+    if (localStorage.getItem("entrenamientoProgress")) {
+      progressData = JSON.parse(localStorage.getItem("entrenamientoProgress"));
+    }
+
+    // Función para guardar en localStorage
+    function saveProgress() {
+      localStorage.setItem("entrenamientoProgress", JSON.stringify(progressData));
+    }
+
+    // Renderizar la rutina según mes y día seleccionados
+    function renderRoutine() {
+      const routineContent = document.getElementById("routineContent");
+      routineContent.innerHTML = "";
+      const monthData = routineData[currentMonth];
+      const dayExercises = monthData.dias[currentDay];
+
+      // Mostrar el objetivo del mes
+      const objectiveEl = document.createElement("div");
+      objectiveEl.className = "mb-6 p-6 bg-white rounded-lg shadow-lg";
+      objectiveEl.innerHTML = `<h2 class="text-2xl font-bold mb-4 text-pink-500 text-center">Objetivo - ${currentMonth}</h2><p class="text-lg text-gray-700">${monthData.objetivo}</p>`;
+      routineContent.appendChild(objectiveEl);
+
+      // Recorrer ejercicios y generar inputs para cada serie
+      dayExercises.forEach((ex, index) => {
+        const exCard = document.createElement("div");
+        exCard.className = "mb-6 p-6 bg-white rounded-lg shadow-lg";
+        let exHTML = `<h3 class="text-xl font-bold text-purple-500">${ex.nombre}</h3>`;
+        exHTML += `<p class="mt-2 text-gray-700">Sets: ${ex.sets} | Reps: ${ex.reps} | Tempo: ${ex.tempo} | Descanso: ${ex.descanso}</p>`;
+        // Si el ejercicio tiene detalles se muestran como lista
+        if (ex.detalles) {
+          exHTML += '<ul class="list-disc pl-5 mt-2 text-gray-700">';
+          ex.detalles.forEach(det => {
+            exHTML += `<li>${det}</li>`;
+          });
+          exHTML += '</ul>';
+        }
+        exHTML += '<div class="mt-4">';
+        for (let s = 0; s < ex.sets; s++) {
+          const key = `${currentMonth}-${currentDay}-${index}-${s}`;
+          const value = progressData[key] || "";
+          exHTML += `<div class="flex items-center gap-2 mb-2">
+                      <span class="text-gray-700 font-semibold">Serie ${s + 1}:</span>
+                      <input type="number" class="border border-gray-300 p-2 rounded w-24 focus:outline-none focus:ring-2 focus:ring-pink-300" data-key="${key}" value="${value}" placeholder="Peso (kg)" />
+                    </div>`;
+        }
+        exHTML += '</div>';
+        exCard.innerHTML = exHTML;
+        routineContent.appendChild(exCard);
+      });
+    }
+
+    // Actualizar gráfico de progreso
+    let chart;
+    function updateChart() {
+      const labels = [];
+      const data = [];
+      // Calcular promedio de peso ingresado para cada mes y día
+      Object.keys(routineData).forEach(month => {
+        ["Día 1", "Día 2", "Día 3"].forEach(day => {
+          const keyPrefix = `${month}-${day}-`;
+          let sum = 0;
+          let count = 0;
+          Object.keys(progressData).forEach(key => {
+            if (key.startsWith(keyPrefix) && progressData[key]) {
+              const val = parseFloat(progressData[key]);
+              if (!isNaN(val)) {
+                sum += val;
+                count++;
+              }
+            }
+          });
+          if (count > 0) {
+            labels.push(`${month} ${day}`);
+            data.push((sum / count).toFixed(2));
+          }
+        });
+      });
+      const ctx = document.getElementById("progressChart").getContext("2d");
+      if (chart) {
+        chart.destroy();
+      }
+      chart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [{
+            label: "Peso promedio (kg)",
+            data: data,
+            borderColor: "purple",
+            backgroundColor: "rgba(128, 0, 128, 0.1)",
+            fill: true,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+    }
+
+    // Escuchar cambios en los inputs para guardar automáticamente
+    document.addEventListener("input", function(e) {
+      if (e.target && e.target.dataset.key) {
+        const key = e.target.dataset.key;
+        progressData[key] = e.target.value;
+        saveProgress();
+      }
+    });
+
+    // Navegación de Meses
+    document.querySelectorAll(".month-btn").forEach(btn => {
+      btn.addEventListener("click", function() {
+        currentMonth = this.dataset.month;
+        renderRoutine();
+      });
+    });
+
+    // Navegación de Días
+    document.querySelectorAll(".day-btn").forEach(btn => {
+      btn.addEventListener("click", function() {
+        currentDay = this.dataset.day;
+        renderRoutine();
+      });
+    });
+
+    // Botón para guardar y actualizar gráfico
+    document.getElementById("saveProgressBtn").addEventListener("click", function() {
+      saveProgress();
+      updateChart();
+      alert("¡Progreso guardado y gráfico actualizado!");
+    });
+
+    // Render inicial y actualización del gráfico
+    renderRoutine();
+    updateChart();
+  </script>
+</body>
+</html>
